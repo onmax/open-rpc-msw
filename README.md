@@ -13,7 +13,11 @@ pnpm test
 
 At the moment, I am not sure how to mock this correctly, and I see this in the console:
 
-```
+<details>
+
+<summary>Console output</summary>
+
+```bash
 maxi@Maxi:~/personal/open-rpc-msw$ nr test
 
 > pkg-placeholder@0.0.0 test /home/maxi/personal/open-rpc-msw
@@ -69,5 +73,20 @@ The latest test that might've caused the error is "should subscribe to block has
  FAIL  Tests failed. Watching for file changes...
        press h to show help, press q to quit
 ```
+
+</details>
+
+## Code structure.
+
+The code is structured as follows:
+
+- The [`blockchain.test.ts`](./test/blockchain.test.ts) file contains the test for the `blockchainStream` method.
+- It mocks the handlers for the WebSocket:
+  - A mock for http is used for upgrading the connection to WebSocket.
+  - A mock for WebSocket is used to handle the messages.
+- The [`blockchain.ts`](./src/blockchain.ts) file contains the implementation of the `blockchainStream` method which basically is a wrapper to the WebSocket class. This code is an extract of my original code found in `albatross-rpc-client-ts` package.
+- The `WebSocket` class uses `@open-rpc/client-js` to make the requests to the server.
+
+## Issue
 
 To follow the progress on the issue, please check out: https://github.com/mswjs/msw/discussions/2414
