@@ -1,4 +1,4 @@
-import { ws } from 'msw'
+import { http, HttpResponse, ws } from 'msw'
 import { setupServer } from 'msw/node'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
@@ -9,6 +9,18 @@ import { WebSocketManager } from '../src/websocket'
 const blockchain = ws.link('ws://localhost:8545')
 
 const mockServer = setupServer(
+  http.get('http://localhost:8648/ws', ({ request }) => {
+    if (request.headers.get('upgrade') === 'websocket') {
+      return new HttpResponse(null, {
+        status: 101,
+        headers: {
+          'Upgrade': 'websocket',
+          'Connection': 'Upgrade',
+          'Sec-WebSocket-Accept': 's3pPLMBiTxaQ9kYGzzhZRbK+xOo=',
+        },
+      })
+    }
+  }),
   // Handle the WebSocket connection and messages
   blockchain.addEventListener('connection', ({ client }) => {
     // Listen for messages from the client
