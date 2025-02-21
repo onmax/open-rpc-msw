@@ -5,11 +5,13 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { BlockchainStream } from '../src/blockchain'
 import { WebSocketManager } from '../src/websocket'
 
+Object.defineProperty(globalThis, 'WebSocket', { value: WebSocket, enumerable: true })
+
 // Create a WebSocket handler using ws.link()
-const blockchain = ws.link('ws://localhost:8545')
+const blockchain = ws.link('ws://localhost:8545/ws')
 
 const mockServer = setupServer(
-  http.get('http://localhost:8648/ws', ({ request }) => {
+  http.get('http://localhost:8545/ws', ({ request }) => {
     if (request.headers.get('upgrade') === 'websocket') {
       return new HttpResponse(null, {
         status: 101,
@@ -43,7 +45,7 @@ describe('blockchainStream', () => {
   afterAll(() => mockServer.close())
 
   it('should subscribe to block hashes', async () => {
-    const ws = new WebSocketManager('ws://localhost:8545')
+    const ws = new WebSocketManager('ws://localhost:8545/ws')
     const blockchain = new BlockchainStream(ws)
 
     const { next } = await blockchain.subscribeForBlockHashes()
