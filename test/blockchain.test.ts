@@ -1,13 +1,10 @@
 import { createHash } from 'node:crypto'
-import WebSocket from 'isomorphic-ws'
 import { http, HttpResponse, ws } from 'msw'
 import { setupServer } from 'msw/node'
-
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { BlockchainStream } from '../src/blockchain'
 import { WebSocketManager } from '../src/websocket'
 
-Object.defineProperty(globalThis, 'WebSocket', { value: WebSocket, enumerable: true })
 const GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 // Create a WebSocket handler using ws.link()
 const blockchain = ws.link('ws://localhost:8545/ws')
@@ -74,7 +71,7 @@ describe('blockchainStream', () => {
       expect(hash).toMatch(/^0x[a-f0-9]{64}$/)
     }
     finally {
-      await ws.close()
+      ws.closeAll()
     }
   }, { timeout: 10000 }) // Increase timeout to 10 seconds
 })
